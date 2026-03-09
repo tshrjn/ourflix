@@ -17,11 +17,11 @@ export default function ContentRow({
   const episodes = series.seasons[0]?.episodes ?? [];
 
   return (
-    <section className="space-y-2 px-4 md:px-12">
-      <h2 className="text-lg font-semibold text-white md:text-xl">
+    <section className="py-6 px-6">
+      <h2 className="text-xl font-bold text-white mb-6">
         {series.title}
       </h2>
-      <div className="hide-scrollbar flex gap-2 overflow-x-auto pb-4 md:gap-3">
+      <div className="hide-scrollbar flex gap-4 overflow-x-auto pb-4">
         {episodes.map((episode) => (
           <EpisodeCard
             key={episode.id}

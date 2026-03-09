@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -20,7 +21,7 @@ export default function Navbar() {
       {/* Left: Logo + Nav Links */}
       <div className="flex items-center gap-6">
         <span className="text-xl font-bold tracking-wider text-red-600 md:text-2xl">
-          NETFLIX
+          OURFLIX
         </span>
         <div className="hidden items-center gap-4 text-sm text-gray-300 md:flex">
           {["Home", "Series", "Movies", "Games", "Popular", "My List"].map(
@@ -75,9 +76,18 @@ export default function Navbar() {
           </svg>
         </button>
         {/* Profile Avatar */}
-        <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-gradient-to-br from-red-600 to-red-800 text-xs font-bold">
-          T
-        </div>
+        {avatarError ? (
+          <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-gradient-to-br from-red-600 to-red-800 text-xs font-bold">
+            T
+          </div>
+        ) : (
+          <img
+            src="/ourflix-profile.jpg"
+            alt="Profile"
+            className="h-8 w-8 rounded-sm object-cover"
+            onError={() => setAvatarError(true)}
+          />
+        )}
       </div>
     </nav>
   );

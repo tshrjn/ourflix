@@ -15,6 +15,7 @@ export default function HeroCarousel({
   onPlay,
 }: HeroCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [coverErrors, setCoverErrors] = useState<Set<string>>(new Set());
 
   const goNext = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % seriesList.length);
@@ -37,12 +38,19 @@ export default function HeroCarousel({
     <div className="relative h-[85vh] w-full overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0">
-        <img
-          key={series.id}
-          src={getPhotoUrl(series.cover_thumbnail_url)}
-          alt={series.title}
-          className="h-full w-full object-cover transition-opacity duration-700"
-        />
+        {coverErrors.has(series.id) ? (
+          <div className="h-full w-full bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900" />
+        ) : (
+          <img
+            key={series.id}
+            src={getPhotoUrl(series.cover_thumbnail_url)}
+            alt={series.title}
+            className="h-full w-full object-cover transition-opacity duration-700"
+            onError={() =>
+              setCoverErrors((prev) => new Set(prev).add(series.id))
+            }
+          />
+        )}
         {/* Gradient overlays */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-[#141414]/20 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#141414]/80 via-transparent to-transparent" />
@@ -65,10 +73,8 @@ export default function HeroCarousel({
         </div>
 
         {/* Top 10 Badge */}
-        <div className="flex items-center gap-2">
-          <div className="flex h-7 items-center rounded bg-red-600 px-1.5 text-xs font-bold">
-            TOP 10
-          </div>
+        <div className="flex items-center gap-3">
+          <img src="/top10.png" alt="TOP 10" className="h-7" />
           <span className="text-sm font-medium text-white">
             #1 in Movies Today
           </span>

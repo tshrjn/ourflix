@@ -12,9 +12,9 @@ vi.mock("@mux/mux-player-react", () => ({
 }));
 
 describe("BrowsePage", () => {
-  it("renders navbar with NETFLIX logo", () => {
+  it("renders navbar with OURFLIX logo", () => {
     render(<BrowsePage />);
-    expect(screen.getByText("NETFLIX")).toBeInTheDocument();
+    expect(screen.getByText("OURFLIX")).toBeInTheDocument();
   });
 
   it("renders hero carousel with series title", () => {
@@ -57,7 +57,7 @@ describe("BrowsePage", () => {
 
   it("opens video player when video episode card clicked", () => {
     render(<BrowsePage />);
-    fireEvent.click(screen.getByText("Our Fan Moment"));
+    fireEvent.click(screen.getByText("Rokka prep"));
     expect(screen.getByTestId("mux-player")).toBeInTheDocument();
   });
 });

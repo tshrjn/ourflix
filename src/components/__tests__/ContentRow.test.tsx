@@ -14,14 +14,14 @@ describe("ContentRow", () => {
 
   it("renders all episode cards", () => {
     render(<ContentRow series={series} onEpisodeClick={onEpisodeClick} />);
-    expect(screen.getByText("Us in our Snapchat Filter era")).toBeInTheDocument();
-    expect(screen.getByText("Our Fan Moment")).toBeInTheDocument();
-    expect(screen.getByText("Lockdown Parties")).toBeInTheDocument();
+    expect(screen.getByText("Museum Day")).toBeInTheDocument();
+    expect(screen.getByText("Jaipuriyaa")).toBeInTheDocument();
+    expect(screen.getByText("1st Stayacation")).toBeInTheDocument();
   });
 
   it("calls onEpisodeClick with correct episode when card clicked", () => {
     render(<ContentRow series={series} onEpisodeClick={onEpisodeClick} />);
-    fireEvent.click(screen.getByText("Our Fan Moment"));
+    fireEvent.click(screen.getByText("Jaipuriyaa"));
     expect(onEpisodeClick).toHaveBeenCalledWith(
       series.seasons[0].episodes[1],
       series

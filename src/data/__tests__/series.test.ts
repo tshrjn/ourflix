@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import {
   getPhotoUrl,
   getMuxThumbnail,
@@ -140,8 +140,8 @@ describe("getEpisodeThumbnail with tokens", () => {
 describe("getAllVideoPlaybackIds", () => {
   it("extracts all video playback IDs from series data", () => {
     const ids = getAllVideoPlaybackIds(seriesData);
-    expect(ids.length).toBe(8); // 8 video episodes total
-    expect(ids).toContain("QjFsZmflm29lx02bLvpGqQhpUWnDTnDpn02Of700rC9Da8");
+    expect(ids.length).toBe(1); // 1 video episode total
+    expect(ids).toContain("HW00AJKHAjC000135ntgnj0001gHCV3017IboJA4fMKupRjwI");
   });
 
   it("returns empty array for empty input", () => {
@@ -187,16 +187,16 @@ describe("seriesData", () => {
     }
   });
 
-  it("series 1 has 7 episodes", () => {
-    expect(seriesData[0].seasons[0].episodes).toHaveLength(7);
+  it("series 1 has 5 episodes", () => {
+    expect(seriesData[0].seasons[0].episodes).toHaveLength(5);
   });
 
-  it("series 2 has 7 episodes", () => {
-    expect(seriesData[1].seasons[0].episodes).toHaveLength(7);
+  it("series 2 has 4 episodes", () => {
+    expect(seriesData[1].seasons[0].episodes).toHaveLength(4);
   });
 
-  it("series 3 has 9 episodes", () => {
-    expect(seriesData[2].seasons[0].episodes).toHaveLength(9);
+  it("series 3 has 4 episodes", () => {
+    expect(seriesData[2].seasons[0].episodes).toHaveLength(4);
   });
 
   it("all episodes have required fields", () => {
@@ -221,5 +221,58 @@ describe("seriesData", () => {
         }
       }
     }
+  });
+});
+
+// ---- Local asset mode (NEXT_PUBLIC_LOCAL_ASSETS=true) ----
+
+describe("local asset mode", () => {
+  let localGetPhotoUrl: typeof getPhotoUrl;
+  let localGetMusicUrl: typeof getMusicUrl;
+  let localLocalAssets: boolean;
+
+  beforeEach(async () => {
+    vi.stubEnv("NEXT_PUBLIC_LOCAL_ASSETS", "true");
+    vi.resetModules();
+    const mod = await import("@/data/series");
+    localGetPhotoUrl = mod.getPhotoUrl;
+    localGetMusicUrl = mod.getMusicUrl;
+    localLocalAssets = mod.LOCAL_ASSETS;
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("LOCAL_ASSETS is true when env var is set", () => {
+    expect(localLocalAssets).toBe(true);
+  });
+
+  it("getPhotoUrl falls back to URL when LOCAL_PHOTO_MAP has no match", () => {
+    const ikUrl =
+      "https://ik.imagekit.io/kahaania/photos/some-old-url.png";
+    expect(localGetPhotoUrl(ikUrl)).toBe(ikUrl);
+  });
+
+  it("getPhotoUrl falls back to original URL for unknown http URLs", () => {
+    const unknownUrl = "https://example.com/unknown.jpg";
+    expect(localGetPhotoUrl(unknownUrl)).toBe(unknownUrl);
+  });
+
+  it("getPhotoUrl prepends /assets/ for relative paths", () => {
+    expect(localGetPhotoUrl("episodes/s1e1/1.jpg")).toBe(
+      "/assets/episodes/s1e1/1.jpg"
+    );
+  });
+
+  it("getMusicUrl returns local path for preset name", () => {
+    expect(localGetMusicUrl("romantic-eternal-love")).toBe(
+      "/assets/music/romantic-eternal-love.mp3"
+    );
+  });
+
+  it("getMusicUrl returns full URL as-is even in local mode", () => {
+    const url = "https://cdn.example.com/music.mp3";
+    expect(localGetMusicUrl(url)).toBe(url);
   });
 });

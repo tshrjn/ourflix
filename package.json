@@ -13,7 +13,10 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report test-reports/e2e-report",
-    "test:e2e:codegen": "playwright codegen http://localhost:3000"
+    "test:e2e:codegen": "playwright codegen http://localhost:3000",
+    "migrate:auth": "tsx scripts/gdrive-auth.ts",
+    "migrate:gdrive": "tsx scripts/gdrive-to-r2.ts",
+    "migrate:dry-run": "tsx scripts/gdrive-to-r2.ts --dry-run"
   },
   "dependencies": {
     "@mux/mux-node": "^12.8.1",
@@ -23,19 +26,25 @@
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.1004.0",
     "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
+    "@types/mime-types": "^3.0.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^5.1.4",
+    "dotenv": "^17.3.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "googleapis": "^171.4.0",
     "jsdom": "^28.1.0",
+    "mime-types": "^3.0.2",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5",
     "vitest": "^4.0.18"
   }

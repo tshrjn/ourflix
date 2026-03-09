@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Episode,
   Series,
@@ -22,6 +22,7 @@ export default function MoreInfoModal({
   thumbnailTokens,
 }: MoreInfoModalProps) {
   const episodes = series.seasons[0]?.episodes ?? [];
+  const [heroError, setHeroError] = useState(false);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -40,11 +41,16 @@ export default function MoreInfoModal({
       <div className="relative w-full max-w-[900px] animate-fade-in overflow-hidden rounded-lg bg-[#181818]">
         {/* Hero Image */}
         <div className="relative aspect-video w-full">
-          <img
-            src={getPhotoUrl(series.cover_thumbnail_url)}
-            alt={series.title}
-            className="h-full w-full object-cover"
-          />
+          {heroError ? (
+            <div className="h-full w-full bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900" />
+          ) : (
+            <img
+              src={getPhotoUrl(series.cover_thumbnail_url)}
+              alt={series.title}
+              className="h-full w-full object-cover"
+              onError={() => setHeroError(true)}
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-[#181818] via-transparent to-transparent" />
 
           {/* Close Button */}

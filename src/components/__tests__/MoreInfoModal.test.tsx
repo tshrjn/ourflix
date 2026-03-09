@@ -34,13 +34,13 @@ describe("MoreInfoModal", () => {
 
   it("renders all episodes in list", () => {
     render(<MoreInfoModal series={series} onClose={onClose} onPlay={onPlay} />);
-    expect(screen.getByText("Us in our Snapchat Filter era")).toBeInTheDocument();
-    expect(screen.getByText("Lockdown Parties")).toBeInTheDocument();
+    expect(screen.getByText("Museum Day")).toBeInTheDocument();
+    expect(screen.getByText("1st Stayacation")).toBeInTheDocument();
   });
 
   it("calls onPlay when episode clicked", () => {
     render(<MoreInfoModal series={series} onClose={onClose} onPlay={onPlay} />);
-    fireEvent.click(screen.getByText("Our Fan Moment"));
+    fireEvent.click(screen.getByText("Jaipuriyaa"));
     expect(onPlay).toHaveBeenCalledWith(series.seasons[0].episodes[1]);
   });
 

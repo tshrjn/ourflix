@@ -85,7 +85,34 @@ your-r2-bucket/
         └── 1.jpg
 ```
 
-### Uploading to R2
+### Automated Migration from Google Drive
+
+If your photos are in Google Drive, use the migration script:
+
+```bash
+# 1. Set up Google Drive API credentials (one-time)
+#    - Create project at https://console.cloud.google.com
+#    - Enable Google Drive API
+#    - Create OAuth 2.0 credentials (Desktop app)
+#    - Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to .env.local
+
+# 2. Authenticate (one-time, opens browser)
+npm run migrate:auth
+
+# 3. Preview what will be uploaded
+npm run migrate:dry-run -- --folder-id=YOUR_DRIVE_FOLDER_ID
+
+# 4. Run the migration
+npm run migrate:gdrive -- --folder-id=YOUR_DRIVE_FOLDER_ID
+```
+
+The script:
+- Recursively downloads all files from the Google Drive folder
+- Uploads to R2 preserving the folder hierarchy as key prefixes
+- Skips system files (.DS_Store, etc.) and already-uploaded files
+- Generates `asset-manifest.json` mapping each file to its R2 URL
+
+### Manual Upload to R2
 
 **Option A: Cloudflare Dashboard (small batches)**
 1. Go to R2 → your bucket → Objects

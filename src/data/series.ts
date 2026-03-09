@@ -39,12 +39,24 @@ export interface Series {
 // (they'll be returned as-is). If using R2, they should be relative paths.
 export const ASSET_BASE_URL = "https://YOUR_ASSET_BASE_URL";
 
+// When true, serves photos/covers/music from public/assets/ instead of CDN.
+// Set NEXT_PUBLIC_LOCAL_ASSETS=true in .env.local for local dev mode.
+export const LOCAL_ASSETS =
+  process.env.NEXT_PUBLIC_LOCAL_ASSETS === "true";
+
+// Maps full ImageKit URLs to local asset paths for local dev mode.
+// Currently unused — all assets use relative paths. Kept for future CDN migration.
+const LOCAL_PHOTO_MAP: Record<string, string> = {};
+
 // ---- URL Helpers ----
-// Supports both relative paths (R2) and full URLs (UploadThing).
-// If the path starts with "http", it's returned as-is.
+// Supports both relative paths (R2) and full URLs (UploadThing/ImageKit).
+// In local mode, maps ImageKit URLs to local /assets/ paths.
 export function getPhotoUrl(path: string): string {
-  if (path.startsWith("http")) return path;
-  return `${ASSET_BASE_URL}/${path}`;
+  if (path.startsWith("http")) {
+    if (LOCAL_ASSETS) return LOCAL_PHOTO_MAP[path] ?? path;
+    return path;
+  }
+  return LOCAL_ASSETS ? `/assets/${path}` : `${ASSET_BASE_URL}/${path}`;
 }
 
 export function getMuxThumbnail(playbackId: string, token?: string): string {
@@ -81,8 +93,10 @@ export function getAllVideoPlaybackIds(seriesList: Series[]): string[] {
 }
 
 // Supports both preset names (R2: prepends base + /music/) and full URLs (UploadThing).
+// In local mode, serves from /assets/music/.
 export function getMusicUrl(preset: string): string {
   if (preset.startsWith("http")) return preset;
+  if (LOCAL_ASSETS) return `/assets/music/${preset}.mp3`;
   return `${ASSET_BASE_URL}/music/${preset}.mp3`;
 }
 
@@ -104,9 +118,9 @@ export function getCategoryTag(episodeOrder: number): string {
 
 // ---- Project Data ----
 export const PROJECT = {
-  name: "NETFLIX",
+  name: "OURFLIX",
   username: "Tushar \u2764\uFE0F Sheetal",
-  profileAvatar: "profile/avatar.jpg",
+  profileAvatar: "/ourflix-profile.jpg",
 };
 
 // ---- Series Data ----
@@ -119,7 +133,7 @@ export const seriesData: Series[] = [
     genre: "Irreverent, Witty & Heartfelt",
     series_cast: "Tushar and Sheetal",
     occasion_type: "Relationship",
-    cover_thumbnail_url: "covers/early-audition-days.png",
+    cover_thumbnail_url: "covers/early-audition-days.jpg",
     seasons: [
       {
         id: "9cab140d-bd0f-4e00-81f8-e9c91bec8198",
@@ -127,82 +141,59 @@ export const seriesData: Series[] = [
         season_order: 1,
         episodes: [
           {
-            id: "a8e81bd4-24a5-46c9-84fc-e486631009d1",
-            episode_title: "Us in our Snapchat Filter era",
-            episode_subtext: "Fire Samjha Kya Re, Flower Hai Hum",
+            id: "a5685280-57f0-4cae-8733-084658bdcbf5",
+            episode_title: "Museum Day",
+            episode_subtext:
+              "Striking a pose by the staircase — floral vibes and effortless elegance",
             episode_type: "photo",
             episode_order: 1,
             video_playback_id: null,
             background_music_url: "romantic-eternal-love",
-            photo_urls: ["episodes/s1e1/1.gif", "episodes/s1e1/2.jpg"],
+            photo_urls: ["episodes/s1e1/1.jpg"],
           },
           {
-            id: "8bcecb5e-e69c-481c-a21d-85a8c383ba20",
-            episode_title: "Our Fan Moment",
+            id: "c236f2e7-afda-428f-8833-0f097d27ebb1",
+            episode_title: "Jaipuriyaa",
             episode_subtext:
-              "The rare occasion when we both agree on the fan speed",
-            episode_type: "video",
+              "Channeling royalty in a Rajasthani palace — SAVAGE tee meets heritage arches",
+            episode_type: "photo",
             episode_order: 2,
-            video_playback_id:
-              "QjFsZmflm29lx02bLvpGqQhpUWnDTnDpn02Of700rC9Da8",
-            background_music_url: null,
-            photo_urls: [],
+            video_playback_id: null,
+            background_music_url: "romantic-eternal-love",
+            photo_urls: ["episodes/s1e2/1.jpg"],
           },
           {
-            id: "0eb76c74-8a0c-46e2-8e66-51e293a9bc28",
-            episode_title: "Teaching Sheetal Cycling",
+            id: "36a32875-acce-4741-878c-8942076b0462",
+            episode_title: "Games with LRIs",
             episode_subtext:
-              "Sowing the seeds of our fitness & sports journey",
+              "Squad goals on a winter night — scarves, beanies and board game battles",
             episode_type: "photo",
             episode_order: 3,
             video_playback_id: null,
-            background_music_url: "romantic-eternal-love",
-            photo_urls: ["episodes/s1e3/1.jpg", "episodes/s1e3/2.jpg"],
+            background_music_url: "romantic-folklore",
+            photo_urls: ["episodes/s1e3/1.jpg"],
           },
           {
-            id: "ea3c59f3-21e0-4d2c-a19e-31af2fdfb57e",
-            episode_title: "Good Hair Days",
+            id: "54dfceb6-010a-4252-becc-75f7d5196408",
+            episode_title: "Garden Blossoms",
             episode_subtext:
-              "Using other people's wedding as pre-wedding photoshoot opportunities.",
+              "Surrounded by kites and cherry blossoms in a heritage courtyard",
             episode_type: "photo",
             episode_order: 4,
             video_playback_id: null,
-            background_music_url: "romantic-eternal-love",
-            photo_urls: ["episodes/s1e4/1.gif"],
-          },
-          {
-            id: "dc478057-ce7c-4a2f-8cd5-2a27aea34b5d",
-            episode_title: "Trying our hand at Tiktok Trends",
-            episode_subtext:
-              "Tushar doesn't mind the occasional dance - if he can sit through it!",
-            episode_type: "video",
-            episode_order: 5,
-            video_playback_id:
-              "rC013kXrmqI02GV91MOP01sZfqiB7YHj2bBQsMXP9KXkJw",
-            background_music_url: null,
-            photo_urls: [],
-          },
-          {
-            id: "ccb7d715-c9c8-4b28-ac56-c9f9f2c1a6ac",
-            episode_title: "Matching PJs",
-            episode_subtext:
-              "A surprise gift from her when I was visiting her",
-            episode_type: "photo",
-            episode_order: 6,
-            video_playback_id: null,
-            background_music_url: "romantic-eternal-love",
-            photo_urls: ["episodes/s1e6/1.jpg"],
-          },
-          {
-            id: "429172af-51d0-42b3-91ba-c81e04475be1",
-            episode_title: "Lockdown Parties",
-            episode_subtext:
-              "Covid got us back in the same city, but dates take out meals inside a car!",
-            episode_type: "photo",
-            episode_order: 7,
-            video_playback_id: null,
             background_music_url: "romantic-folklore",
-            photo_urls: ["episodes/s1e7/1.jpg"],
+            photo_urls: ["episodes/s1e4/1.jpg"],
+          },
+          {
+            id: "539eda3f-0b38-4afd-ad03-0b0f3a1139ca",
+            episode_title: "1st Stayacation",
+            episode_subtext:
+              "Twinning in prints for our first hotel staycation — peace out!",
+            episode_type: "photo",
+            episode_order: 5,
+            video_playback_id: null,
+            background_music_url: "romantic-white-petals",
+            photo_urls: ["episodes/s1e5/1.jpg"],
           },
         ],
       },
@@ -216,7 +207,7 @@ export const seriesData: Series[] = [
     genre: "Emotional, D Day, Feel Good",
     series_cast: "Tushar and Sheetal",
     occasion_type: "Wedding",
-    cover_thumbnail_url: "covers/wedding.png",
+    cover_thumbnail_url: "covers/wedding.jpg",
     seasons: [
       {
         id: "fd0d89dc-ec0d-45d8-a01a-8f9afa86f50a",
@@ -225,84 +216,48 @@ export const seriesData: Series[] = [
         episodes: [
           {
             id: "0f55b546-f945-4bfc-b232-cf89ae54cca2",
-            episode_title: "Surprise!",
+            episode_title: "Rokka prep",
             episode_subtext:
-              "Sheetal shocked by everyone turning up on time",
-            episode_type: "photo",
+              "Behind the scenes of the big day preparations",
+            episode_type: "video",
             episode_order: 1,
-            video_playback_id: null,
-            background_music_url: "happy",
-            photo_urls: [
-              "episodes/s2e1/1.jpg",
-              "episodes/s2e1/2.jpg",
-              "episodes/s2e1/3.jpg",
-            ],
+            video_playback_id:
+              "HW00AJKHAjC000135ntgnj0001gHCV3017IboJA4fMKupRjwI",
+            background_music_url: null,
+            photo_urls: [],
           },
           {
-            id: "7722cb94-93b8-429f-b229-149c25507331",
-            episode_title: "Sheetal's Musical Haldi",
+            id: "923a4cce-6681-43ee-9641-da9bdebb8225",
+            episode_title: "The Proposal Day",
             episode_subtext:
-              "I paid homage to my years in the South while Sheetal wore a hand painted skirt",
+              "Rose petals, candlelight, and the question that changed everything",
             episode_type: "photo",
             episode_order: 2,
             video_playback_id: null,
-            background_music_url: "holiday",
-            photo_urls: ["episodes/s2e2/1.jpg", "episodes/s2e2/2.jpg"],
+            background_music_url: "happy",
+            photo_urls: ["episodes/s2e2/1.jpg"],
           },
           {
-            id: "cf1ab8af-53e6-498a-bbdf-15495c183d59",
-            episode_title: "Gratitude",
+            id: "58b0317b-6142-4e0e-b888-dd67b6105ad1",
+            episode_title: "Twirling in the Roka",
             episode_subtext:
-              "Thanking everyone for their blessings. Were we first or did Sid Kiara beat us to this pose?",
+              "Twirling her in a pink lehenga under the chandeliers",
             episode_type: "photo",
             episode_order: 3,
             video_playback_id: null,
-            background_music_url: "happy",
+            background_music_url: "holiday",
             photo_urls: ["episodes/s2e3/1.jpg"],
           },
           {
-            id: "884dad66-ba0a-4c01-9f78-dfce662a34fc",
-            episode_title: "Calm amidst the Storm",
-            episode_subtext: "One of the moments we found to ourselves",
+            id: "eaa03f5d-3cd6-4669-bcdc-435705d662b3",
+            episode_title: "Roka Power Pose",
+            episode_subtext:
+              "That one frame among the flowers that made it all feel real",
             episode_type: "photo",
             episode_order: 4,
             video_playback_id: null,
             background_music_url: "holiday",
             photo_urls: ["episodes/s2e4/1.jpg"],
-          },
-          {
-            id: "9fae8cda-e280-4431-80cc-4d2afcf91b7a",
-            episode_title: "The First Dance",
-            episode_subtext:
-              'We learnt the steps to "I will walk 500 Miles" 10 mins before so Tushar (hates dancing) could fulfil his promise to Sheetal',
-            episode_type: "photo",
-            episode_order: 5,
-            video_playback_id: null,
-            background_music_url: "romantic-folklore",
-            photo_urls: ["episodes/s2e5/1.jpg"],
-          },
-          {
-            id: "00bc10bb-7c3d-4647-9a34-5ce6f92f9d38",
-            episode_title: "T-1 - Inviting the God's Blessings",
-            episode_subtext:
-              "Stealing hugs before the 1st set of Poojas begin",
-            episode_type: "photo",
-            episode_order: 6,
-            video_playback_id: null,
-            background_music_url: "romantic-eternal-love",
-            photo_urls: ["episodes/s2e6/1.jpg"],
-          },
-          {
-            id: "e1c4ae0b-dc1c-4d7b-97f0-42d64602b17e",
-            episode_title: "Thodi Si Toh Lift Kara De",
-            episode_subtext:
-              "One of our favourite failed attempts - would not recommend open footwear!",
-            episode_type: "video",
-            episode_order: 7,
-            video_playback_id:
-              "esr2002CWHL8PJG5QmthLN8oC5lqntHEZbcZmHsEmYMQ",
-            background_music_url: null,
-            photo_urls: [],
           },
         ],
       },
@@ -316,7 +271,7 @@ export const seriesData: Series[] = [
     genre: "Captivating, Nature, Adventure",
     series_cast: "Tushar and Sheetal",
     occasion_type: "Travel",
-    cover_thumbnail_url: "covers/travel.png",
+    cover_thumbnail_url: "covers/travel.jpg",
     seasons: [
       {
         id: "f43f4da4-f33e-4d7f-aa36-a233fa5b6f52",
@@ -324,112 +279,48 @@ export const seriesData: Series[] = [
         season_order: 1,
         episodes: [
           {
-            id: "63524f7b-ab48-49dc-ba4c-b7f8c5bf530a",
-            episode_title: "Havelock, Andaman Islands",
+            id: "ac0288be-2ef6-44fe-9d5a-7404e054a248",
+            episode_title: "Milo Milan",
             episode_subtext:
-              "Swim, Snorkel & Scuba - Indulging in our love for Water together is our favourite getaway activity",
-            episode_type: "video",
+              "Sunset over the city skyline from the Duomo rooftop",
+            episode_type: "photo",
             episode_order: 1,
-            video_playback_id:
-              "kMxzrwlKxh02dDO7k4K4rTYqc01V1pfXNCQE36pF13qvg",
-            background_music_url: null,
-            photo_urls: [],
+            video_playback_id: null,
+            background_music_url: "holiday",
+            photo_urls: ["episodes/s3e1/1.jpg"],
           },
           {
-            id: "4e073dbd-9596-4c08-95ee-9c9b3cdf5ed6",
-            episode_title: "Majorda, Goa",
+            id: "ad3bb2f3-29c3-44b4-849c-6bc4a6aead65",
+            episode_title: "Leaning Pisa",
             episode_subtext:
-              "Found some cute puppies waiting for us when we revisited the beach we got married on",
-            episode_type: "video",
+              "Mandatory tourist selfie — grinning harder than the tower is leaning",
+            episode_type: "photo",
             episode_order: 2,
-            video_playback_id:
-              "v5p1MOfuYsJZsaLoN3xq02i8nVvakBl93zGvJ24Q4lvU",
-            background_music_url: null,
-            photo_urls: [],
+            video_playback_id: null,
+            background_music_url: "holiday",
+            photo_urls: ["episodes/s3e2/1.jpg"],
           },
           {
-            id: "9df6431a-e4e1-4c4e-ac25-f1eb6b5070b5",
-            episode_title: "Maldives",
+            id: "8f921314-e9bf-47aa-98a2-ab0effeb0df6",
+            episode_title: "Italian Model, Venice",
             episode_subtext:
-              "Living up the Resort Life - pretending we did not skip lunch for the all inclusive dinner",
+              "Grand Canal, gondolas, and giving her best Italian model energy",
             episode_type: "photo",
             episode_order: 3,
             video_playback_id: null,
-            background_music_url: "romantic-white-petals",
-            photo_urls: [
-              "episodes/s3e3/1.jpg",
-              "episodes/s3e3/2.jpg",
-              "episodes/s3e3/3.jpg",
-            ],
+            background_music_url: "holiday",
+            photo_urls: ["episodes/s3e3/1.jpg"],
           },
           {
-            id: "e8cbc308-e307-4c17-9dd2-862127832744",
-            episode_title: "Colva, Goa",
+            id: "c51cbbc1-11ff-460c-af9e-6ac841061880",
+            episode_title: "One with the Eiffel",
             episode_subtext:
-              "Our favourite Beach Shack in Goa - Boomerang Beach Bar - you gotta bounce back here",
+              "Obligatory Paris selfie — because did you even go if you didn't get this shot?",
             episode_type: "photo",
             episode_order: 4,
             video_playback_id: null,
             background_music_url: "holiday",
             photo_urls: ["episodes/s3e4/1.jpg"],
-          },
-          {
-            id: "e64faac5-6f99-4c0a-8235-30ae659b6410",
-            episode_title: "Kyoto, Japan",
-            episode_subtext:
-              "Waking up super early to beat the crowds was totally worth it!",
-            episode_type: "photo",
-            episode_order: 5,
-            video_playback_id: null,
-            background_music_url: null,
-            photo_urls: ["episodes/s3e5/1.jpg"],
-          },
-          {
-            id: "5cb2c831-b998-4d05-a469-3c549dacfa97",
-            episode_title: "Gokarna, Karnataka",
-            episode_subtext:
-              "Reawakening the child in us on a quick weekend getaway from Bangalore",
-            episode_type: "video",
-            episode_order: 6,
-            video_playback_id:
-              "qwesb3C4pXUXj6Pbb7Ru00NBcjRnaGyPSa601JRKYniJE",
-            background_music_url: null,
-            photo_urls: [],
-          },
-          {
-            id: "1db97210-ff3e-49fe-81de-24917ee0c844",
-            episode_title: "Koh Tao, Thailand",
-            episode_subtext:
-              "Most treks are about the journey, but some like this are also about the view from the summit!",
-            episode_type: "photo",
-            episode_order: 7,
-            video_playback_id: null,
-            background_music_url: null,
-            photo_urls: ["episodes/s3e7/1.jpg"],
-          },
-          {
-            id: "9592375e-5b91-4f2f-8c2e-7e205ff21286",
-            episode_title: "Digurah, Maldives",
-            episode_subtext:
-              "Finding our little private moment on a beautiful Maldivian local island",
-            episode_type: "video",
-            episode_order: 8,
-            video_playback_id:
-              "Um9VrdQPs5dtkAP8mii2FeyXSf014Vuwix01L8Us2WSkE",
-            background_music_url: null,
-            photo_urls: [],
-          },
-          {
-            id: "4e374ebd-2932-461f-81cc-a377bafd1639",
-            episode_title: "Bandipur, Karnataka",
-            episode_subtext:
-              "Driving so close to wildlife on our way to Ooty was so surreal.",
-            episode_type: "video",
-            episode_order: 9,
-            video_playback_id:
-              "K7k1h801mPEH1a7fKwYsXDlO6dNFZXOAVBBm01K201JV8s",
-            background_music_url: null,
-            photo_urls: [],
           },
         ],
       },

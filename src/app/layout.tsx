@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "NETFLIX",
+  title: "OURFLIX",
   description: "Your memories, streaming like never before",
 };
 

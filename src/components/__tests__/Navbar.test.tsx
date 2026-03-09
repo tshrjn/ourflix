@@ -3,9 +3,9 @@ import { render, screen } from "@testing-library/react";
 import Navbar from "@/components/Navbar";
 
 describe("Navbar", () => {
-  it("renders NETFLIX logo", () => {
+  it("renders OURFLIX logo", () => {
     render(<Navbar />);
-    expect(screen.getByText("NETFLIX")).toBeInTheDocument();
+    expect(screen.getByText("OURFLIX")).toBeInTheDocument();
   });
 
   it("renders all nav links", () => {
@@ -15,8 +15,10 @@ describe("Navbar", () => {
     }
   });
 
-  it("renders profile avatar", () => {
+  it("renders profile avatar image", () => {
     render(<Navbar />);
-    expect(screen.getByText("T")).toBeInTheDocument();
+    const avatar = screen.getByAltText("Profile");
+    expect(avatar).toBeInTheDocument();
+    expect(avatar.tagName).toBe("IMG");
   });
 });
