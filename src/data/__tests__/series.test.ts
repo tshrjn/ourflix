@@ -3,6 +3,7 @@ import {
   getPhotoUrl,
   getMuxThumbnail,
   getEpisodeThumbnail,
+  getAllVideoPlaybackIds,
   getMusicUrl,
   getCategoryTag,
   CATEGORY_TAGS,
@@ -32,6 +33,21 @@ describe("getPhotoUrl", () => {
 describe("getMuxThumbnail", () => {
   it("builds correct Mux thumbnail URL", () => {
     const id = "QjFsZmflm29lx02bLvpGqQhpUWnDTnDpn02Of700rC9Da8";
+    expect(getMuxThumbnail(id)).toBe(
+      `https://image.mux.com/${id}/thumbnail.jpg`
+    );
+  });
+
+  it("appends token query param when provided", () => {
+    const id = "abc123";
+    const token = "jwt-token-here";
+    expect(getMuxThumbnail(id, token)).toBe(
+      `https://image.mux.com/${id}/thumbnail.jpg?token=${token}`
+    );
+  });
+
+  it("returns bare URL when token is undefined", () => {
+    const id = "abc123";
     expect(getMuxThumbnail(id)).toBe(
       `https://image.mux.com/${id}/thumbnail.jpg`
     );
@@ -83,6 +99,53 @@ describe("getEpisodeThumbnail", () => {
       photo_urls: [],
     };
     expect(getEpisodeThumbnail(episode)).toBe("");
+  });
+});
+
+describe("getEpisodeThumbnail with tokens", () => {
+  it("uses token from thumbnailTokens map for video episodes", () => {
+    const episode: Episode = {
+      id: "test",
+      episode_title: "Test",
+      episode_subtext: "",
+      episode_type: "video",
+      episode_order: 1,
+      video_playback_id: "abc123",
+      background_music_url: null,
+      photo_urls: [],
+    };
+    const tokens = { abc123: "my-jwt-token" };
+    expect(getEpisodeThumbnail(episode, tokens)).toBe(
+      "https://image.mux.com/abc123/thumbnail.jpg?token=my-jwt-token"
+    );
+  });
+
+  it("returns bare URL when thumbnailTokens is empty", () => {
+    const episode: Episode = {
+      id: "test",
+      episode_title: "Test",
+      episode_subtext: "",
+      episode_type: "video",
+      episode_order: 1,
+      video_playback_id: "abc123",
+      background_music_url: null,
+      photo_urls: [],
+    };
+    expect(getEpisodeThumbnail(episode, {})).toBe(
+      "https://image.mux.com/abc123/thumbnail.jpg"
+    );
+  });
+});
+
+describe("getAllVideoPlaybackIds", () => {
+  it("extracts all video playback IDs from series data", () => {
+    const ids = getAllVideoPlaybackIds(seriesData);
+    expect(ids.length).toBe(8); // 8 video episodes total
+    expect(ids).toContain("QjFsZmflm29lx02bLvpGqQhpUWnDTnDpn02Of700rC9Da8");
+  });
+
+  it("returns empty array for empty input", () => {
+    expect(getAllVideoPlaybackIds([])).toEqual([]);
   });
 });
 
