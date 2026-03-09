@@ -1,4 +1,4 @@
-# Kahaania
+# OURFLIX
 
 A Netflix-style streaming app for personal memories — photos, videos, and music presented as series and episodes.
 
