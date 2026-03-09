@@ -114,6 +114,11 @@ export default function BrowsePage() {
           onClose={() => setActivePlayer(null)}
           onPrev={canGoPrev ? () => navigateEpisode("prev") : undefined}
           onNext={canGoNext ? () => navigateEpisode("next") : undefined}
+          thumbnailToken={
+            activePlayer.episode.video_playback_id
+              ? thumbnailTokens[activePlayer.episode.video_playback_id]
+              : undefined
+          }
         />
       )}
     </div>
